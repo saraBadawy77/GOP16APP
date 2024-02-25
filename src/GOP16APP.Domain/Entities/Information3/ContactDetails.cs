@@ -43,7 +43,7 @@ namespace GOP16APP.Entities.Information3
         [MaxLength(100)]
         public string FocalPointEmail { get; set; }
 
-        [MaxLength(100)]
+        [MaxLength(500)]
         public string? SpecificRequests { get; set; }
 
     }
