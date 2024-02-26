@@ -13,8 +13,8 @@ using Volo.Abp.EntityFrameworkCore;
 namespace GOP16APP.Migrations
 {
     [DbContext(typeof(GOP16APPDbContext))]
-    [Migration("20240225075015_moreupdates")]
-    partial class moreupdates
+    [Migration("20240226090604_addMoreUpdates")]
+    partial class addMoreUpdates
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
