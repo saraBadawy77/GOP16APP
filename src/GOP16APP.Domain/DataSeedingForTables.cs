@@ -14,6 +14,7 @@ using Volo.Abp.DependencyInjection;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.MultiTenancy;
 
+
 namespace GOP16APP
 {
     public class DataSeedingForTables : IDataSeedContributor, ITransientDependency
@@ -22,7 +23,11 @@ namespace GOP16APP
         private readonly IRepository<Qualification, Guid> _qualificationrepository;
         private readonly IRepository<Sector, Guid> _sectorrepository;
         private readonly IRepository<Level, Guid> _levelrepository;
+      //  private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ICurrentTenant _currentTenant;
+
+       
+
 
         public DataSeedingForTables(IRepository<OrganizationCategory, Guid> categoryrepository, IRepository<Qualification, Guid> qualificationrepository, ICurrentTenant currentTenant, IRepository<Sector, Guid> sectorrepository, IRepository<Level, Guid> levelrepository)
         {
@@ -31,19 +36,29 @@ namespace GOP16APP
             _currentTenant = currentTenant;
             _sectorrepository = sectorrepository;
             _levelrepository = levelrepository;
+          
         }
 
 
 
         public async  Task SeedAsync(DataSeedContext context)
         {
+            var rootPath = AppDomain.CurrentDomain.BaseDirectory;
+            var dataSeedFolderPath = Path.Combine(rootPath,"DataSeed");
+            var organizationCategoryFilePath = Path.Combine(dataSeedFolderPath, "OrganizationCategoryData.json");
+            var qualificationFilePath = Path.Combine(dataSeedFolderPath, "QualificationData.json");
+            var sectorFilePath = Path.Combine(dataSeedFolderPath, "SectorData.json");
+            var levelRepresentationFilePath = Path.Combine(dataSeedFolderPath, "LevelRepresentationData.json");
+
+
             using (_currentTenant.Change(context?.TenantId))
             {
 
-                await SeedOrganizationCategoryIfEmpty();
-                await SeedQualificationIfEmpty();
-                await SeedSectorIfEmpty();
-                await SeedLevelRepresentationIfEmpty();
+                await SeedOrganizationCategoryIfEmpty(organizationCategoryFilePath);
+                await SeedQualificationIfEmpty(qualificationFilePath);
+                await SeedSectorIfEmpty(sectorFilePath);
+                await SeedLevelRepresentationIfEmpty(levelRepresentationFilePath);
+              
 
             }  
         }
@@ -51,16 +66,16 @@ namespace GOP16APP
 
 
         //SeedOrganizationCategoryIfEmpty
-        private async Task SeedOrganizationCategoryIfEmpty()
+        private async Task SeedOrganizationCategoryIfEmpty(string filePath)
         {
+            
             if (await _Categoryrepository.GetCountAsync() > 0)
             {
                 return;
             }
 
-            var CategoriesData = File.ReadAllText("C:/Users/sara/Desktop/Innovascop/GOP16APP/GOP16APP/aspnet-core/src/GOP16APP.EntityFrameworkCore/DataSeed/OrganizationCategoryData.json");
-
-            var Categories = JsonSerializer.Deserialize<List<OrganizationCategory>>(CategoriesData);
+            var categoriesData = File.ReadAllText(filePath);
+            var Categories = JsonSerializer.Deserialize<List<OrganizationCategory>>(categoriesData);
             if (Categories is not null && Categories.Count > 0)
             {
                 foreach (var Categorie in Categories)
@@ -76,15 +91,14 @@ namespace GOP16APP
 
         //SeedQualificationIfEmpty
 
-        private async Task SeedQualificationIfEmpty()
+        private async Task SeedQualificationIfEmpty(string filePath)
         {
             if (await _qualificationrepository.GetCountAsync() > 0)
             {
                 return;
             }
 
-            var qualificationsData = File.ReadAllText("C:/Users/sara/Desktop/Innovascop/GOP16APP/GOP16APP/aspnet-core/src/GOP16APP.EntityFrameworkCore/DataSeed/QualificationData.json");
-
+            var qualificationsData = File.ReadAllText(filePath);
             var qualifications = JsonSerializer.Deserialize<List<Qualification>>(qualificationsData);
             if (qualifications is not null && qualifications.Count > 0)
             {
@@ -101,15 +115,14 @@ namespace GOP16APP
 
         //SeedSectorIfEmpty
 
-        private async Task SeedSectorIfEmpty()
+        private async Task SeedSectorIfEmpty(string filePath)
         {
             if (await _sectorrepository.GetCountAsync() > 0)
             {
                 return;
             }
 
-            var SectorData = File.ReadAllText("C:/Users/sara/Desktop/Innovascop/GOP16APP/GOP16APP/aspnet-core/src/GOP16APP.EntityFrameworkCore/DataSeed/SectorData.json");
-
+            var SectorData = File.ReadAllText(filePath);
             var Sectors = JsonSerializer.Deserialize<List<Sector>>(SectorData);
             if (Sectors is not null && Sectors.Count > 0)
             {
@@ -126,15 +139,14 @@ namespace GOP16APP
 
         //SeedLevelRepresentationIfEmpty
 
-        private async Task SeedLevelRepresentationIfEmpty()
+        private async Task SeedLevelRepresentationIfEmpty(string filePath)
         {
             if (await _levelrepository.GetCountAsync() > 0)
             {
                 return;
             }
 
-            var LevelData = File.ReadAllText("C:/Users/sara/Desktop/Innovascop/GOP16APP/GOP16APP/aspnet-core/src/GOP16APP.EntityFrameworkCore/DataSeed/LevelRepresentationData.json");
-
+            var LevelData = File.ReadAllText(filePath);
             var levels = JsonSerializer.Deserialize<List<Level>>(LevelData);
             if (levels is not null && levels.Count > 0)
             {
